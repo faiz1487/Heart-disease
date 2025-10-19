@@ -1,0 +1,1 @@
+streamlit run "D:\final project\heart disease\heart_disease pred.py"
