@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/faiz1487/Heart-disease.git'
+                git 'https://github.com/faiz1487/Heart-disease.git', branch: 'main'
             }
         }
 
