@@ -23,7 +23,7 @@ pipeline {
 
         stage('Login to DockerHub') {
             steps {
-                withDockerRegistry(credentialsId: 'docker', url: 'https://index.docker.io/v1/') {
+                withDockerRegistry(credentialsId: 'dockerhub-cred-faiz', url: 'https://index.docker.io/v1/') {
                     echo "Logged in to DockerHub"
                 }
             }
