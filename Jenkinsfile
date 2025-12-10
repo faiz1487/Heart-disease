@@ -2,35 +2,37 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_REPO = "faizan141/heart-disease"   // Your Docker Hub Repo
+        DOCKERHUB_REPO = "faiz18887/heart-disease"
         IMAGE_TAG = "latest"
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout Code') {
             steps {
-                git 'https://github.com/faiz1487/Heart-disease.git', branch: 'main'
+                git url: 'https://github.com/faiz1487/Heart-disease.git', branch: 'main'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKERHUB_REPO:$IMAGE_TAG .'
+                script {
+                    dockerImage = docker.build("${DOCKERHUB_REPO}:${IMAGE_TAG}")
+                }
             }
         }
 
         stage('Login to DockerHub') {
             steps {
-                withDockerRegistry(credentialsId: 'dockerhub-credentials', url: 'https://index.docker.io/v1/') {
-                    // Successfully authenticated
+                withDockerRegistry(credentialsId: 'dockerhub-cred-faiz', url: 'https://index.docker.io/v1/') {
+                    echo "Logged in to DockerHub"
                 }
             }
         }
 
         stage('Push Image to DockerHub') {
             steps {
-                withDockerRegistry(credentialsId: 'dockerhub-credentials', url: 'https://index.docker.io/v1/') {
-                    sh 'docker push $DOCKERHUB_REPO:$IMAGE_TAG'
+                script {
+                    dockerImage.push("${IMAGE_TAG}")
                 }
             }
         }
@@ -38,10 +40,16 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 sh '''
-                docker rm -f heart-app || true
-                docker run -d -p 5000:5000 --name heart-app $DOCKERHUB_REPO:$IMAGE_TAG
+                  docker rm -f heart-disease-app || true
+                  docker run -d -p 5000:5000 --name heart-disease-app ${DOCKERHUB_REPO}:${IMAGE_TAG}
                 '''
             }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline finished."
         }
     }
 }
